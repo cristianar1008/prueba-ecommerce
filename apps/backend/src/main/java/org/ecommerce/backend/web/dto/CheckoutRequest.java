@@ -1,4 +1,6 @@
 package org.ecommerce.backend.web.dto;
 
-public class CheckoutRequest {
+import java.util.List;
+
+public record CheckoutRequest(List<CheckoutItemRequest> items, String couponCode) {
 }

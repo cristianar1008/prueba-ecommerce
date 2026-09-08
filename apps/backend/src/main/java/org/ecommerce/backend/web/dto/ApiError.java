@@ -1,4 +1,11 @@
 package org.ecommerce.backend.web.dto;
 
-public class ApiError {
+import java.time.LocalDateTime;
+
+public record ApiError(
+        LocalDateTime timestamp,
+        int status,
+        String error,
+        String message
+) {
 }
