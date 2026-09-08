@@ -1,0 +1,12 @@
+# Entornos y secretos
+.env
+*.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend (Angular) - se completa en la Fase 2
+# node_modules/
+# dist/
+# .angular/
