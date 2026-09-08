@@ -38,6 +38,13 @@ public class DiscountContext {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    public BigDecimal getSubtotalAfterAppliedDiscounts() {
+        return subtotalOriginal
+                .subtract(categoryDiscountAmount)
+                .subtract(volumeDiscountAmount)
+                .subtract(couponDiscountAmount);
+    }
+
     public List<CartItem> getItems() {
         return items;
     }

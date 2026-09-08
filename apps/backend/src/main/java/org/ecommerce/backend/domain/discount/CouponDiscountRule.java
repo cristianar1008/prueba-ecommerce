@@ -27,6 +27,7 @@ public class CouponDiscountRule implements DiscountRule {
             throw new InvalidCouponException(couponCode);
         }
 
-        context.setCouponDiscountAmount(context.getSubtotalOriginal().multiply(percentage.get()));
+        BigDecimal subtotalAfterVolume = context.getSubtotalAfterAppliedDiscounts();
+        context.setCouponDiscountAmount(subtotalAfterVolume.multiply(percentage.get()));
     }
 }

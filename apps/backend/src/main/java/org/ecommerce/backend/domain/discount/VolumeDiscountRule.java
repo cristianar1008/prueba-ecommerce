@@ -16,9 +16,11 @@ public class VolumeDiscountRule implements DiscountRule {
 
     @Override
     public void apply(DiscountContext context) {
-        if (context.getSubtotalOriginal().compareTo(threshold) <= 0) {
+        BigDecimal subtotalAfterCategory = context.getSubtotalAfterAppliedDiscounts();
+
+        if (subtotalAfterCategory.compareTo(threshold) <= 0) {
             return;
         }
-        context.setVolumeDiscountAmount(context.getSubtotalOriginal().multiply(percentage));
+        context.setVolumeDiscountAmount(subtotalAfterCategory.multiply(percentage));
     }
 }
