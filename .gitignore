@@ -10,3 +10,8 @@ Thumbs.db
 # node_modules/
 # dist/
 # .angular/
+
+# IDE (root-level, opened as whole monorepo)
+.idea/
+*.iml
+.vscode/
