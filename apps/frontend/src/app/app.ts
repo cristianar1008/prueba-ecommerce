@@ -23,4 +23,8 @@ export class App {
   toggleCart(): void {
     this.shop.toggleCart();
   }
+
+  goHome(): void {
+    this.shop.backToCatalog();
+  }
 }

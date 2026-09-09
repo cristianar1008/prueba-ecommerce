@@ -1,7 +1,12 @@
 <app-discount-alert />
 
 <header class="topbar">
-  <h1>{{ title }}</h1>
+  <div class="topbar-left">
+    <button type="button" class="home-button" (click)="goHome()" aria-label="Volver al inicio">
+      <span aria-hidden="true">🏠</span>
+    </button>
+    <h1>{{ title }}</h1>
+  </div>
   <button type="button" class="cart-icon-button" (click)="toggleCart()" aria-label="Abrir carrito">
     <span aria-hidden="true">🛒</span>
     @if ((itemCount$ | async); as count) {
