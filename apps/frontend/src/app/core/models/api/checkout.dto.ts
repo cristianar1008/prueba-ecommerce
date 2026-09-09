@@ -11,7 +11,7 @@ export interface CheckoutRequestDto {
 
 /** Forma exacta de CheckoutResponse (web/dto en el backend). */
 export interface CheckoutResponseDto {
-  orderId: number;
+  orderId: number | null; // null en la respuesta de /simulate (no se persiste ninguna orden)
   subtotalOriginal: number;
   categoryDiscountAmount: number;
   volumeDiscountAmount: number;

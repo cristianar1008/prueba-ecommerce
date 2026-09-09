@@ -43,4 +43,30 @@ describe('CheckoutApiService', () => {
 
     expect(result).toEqual(response);
   });
+
+  it('hace POST a /api/checkout/simulate con el body exacto y devuelve la respuesta', () => {
+    const response: CheckoutResponseDto = {
+      orderId: null,
+      subtotalOriginal: 150,
+      categoryDiscountAmount: 15,
+      volumeDiscountAmount: 0,
+      couponDiscountAmount: 0,
+      discountCapApplied: false,
+      totalDiscountAmount: 15,
+      effectiveDiscountPercentage: 0.1,
+      totalToPay: 135,
+    };
+
+    let result: CheckoutResponseDto | undefined;
+    service
+      .simulate({ items: [{ productId: 1, quantity: 1 }], couponCode: null })
+      .subscribe((value) => (result = value));
+
+    const req = httpMock.expectOne('/api/checkout/simulate');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ items: [{ productId: 1, quantity: 1 }], couponCode: null });
+    req.flush(response);
+
+    expect(result).toEqual(response);
+  });
 });

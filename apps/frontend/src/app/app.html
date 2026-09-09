@@ -2,12 +2,22 @@
 
 <header class="topbar">
   <h1>{{ title }}</h1>
+  <button type="button" class="cart-icon-button" (click)="toggleCart()" aria-label="Abrir carrito">
+    <span aria-hidden="true">🛒</span>
+    @if ((itemCount$ | async); as count) {
+      @if (count > 0) {
+        <span class="cart-badge">{{ count }}</span>
+      }
+    }
+  </button>
 </header>
 
 <main class="layout">
-  <app-catalog class="panel catalog-panel" />
-  <div class="panel side-panel">
-    <app-cart />
+  @if ((view$ | async) === 'checkout') {
     <app-checkout />
-  </div>
+  } @else {
+    <app-catalog />
+  }
 </main>
+
+<app-cart />
