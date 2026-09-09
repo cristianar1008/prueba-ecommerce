@@ -42,32 +42,32 @@ WHERE sc.name = 'ACTIVO'
 
 -- Productos - Tecnologia
 INSERT INTO product (name, unit_price, stock, id_category, image_url)
-SELECT 'Laptop X1', 150.00, 10, c.id, 'https://placehold.co/400x300/2563eb/ffffff?text=Laptop+X1'
+SELECT 'Laptop X1', 150.00, 10, c.id, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiGT9JASNN9WnW5cuyBqiXga2qzNWGRC2ea9NIMfLkdg&s=10'
 FROM category c WHERE c.name = 'Tecnologia'
                   AND NOT EXISTS (SELECT 1 FROM product p WHERE p.name = 'Laptop X1');
 
 INSERT INTO product (name, unit_price, stock, id_category, image_url)
-SELECT 'Mouse Inalambrico', 50.00, 20, c.id, 'https://placehold.co/400x300/2563eb/ffffff?text=Mouse'
+SELECT 'Mouse Inalambrico', 50.00, 20, c.id, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRS3H-vRE93jG76rY-aJ8FzblhSWyY_cIdvvHd99JeFHg&s=10'
 FROM category c WHERE c.name = 'Tecnologia'
                   AND NOT EXISTS (SELECT 1 FROM product p WHERE p.name = 'Mouse Inalambrico');
 
 INSERT INTO product (name, unit_price, stock, id_category, image_url)
-SELECT 'Teclado Mecanico', 80.00, 15, c.id, 'https://placehold.co/400x300/2563eb/ffffff?text=Teclado'
+SELECT 'Teclado Mecanico', 80.00, 15, c.id, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ19CB6jnG9mQz72ZvGnNqzJZ0KsFaBiPab4n7F7hOurw&s=10'
 FROM category c WHERE c.name = 'Tecnologia'
                   AND NOT EXISTS (SELECT 1 FROM product p WHERE p.name = 'Teclado Mecanico');
 
 INSERT INTO product (name, unit_price, stock, id_category, image_url)
-SELECT 'Monitor 24 pulgadas', 120.00, 8, c.id, 'https://placehold.co/400x300/2563eb/ffffff?text=Monitor'
+SELECT 'Monitor 24 pulgadas', 120.00, 8, c.id, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcZ35xVV2qOrKaduQAr8XY0-crv1XNEOpenD-VomHGOg&s=10'
 FROM category c WHERE c.name = 'Tecnologia'
                   AND NOT EXISTS (SELECT 1 FROM product p WHERE p.name = 'Monitor 24 pulgadas');
 
 -- Productos - Hogar (no reciben descuento de categoria)
 INSERT INTO product (name, unit_price, stock, id_category, image_url)
-SELECT 'Silla de Oficina', 90.00, 5, c.id, 'https://placehold.co/400x300/16a34a/ffffff?text=Silla'
+SELECT 'Silla de Oficina', 90.00, 5, c.id, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmz-jzeBjksGuhskxSXn8KhQU18nb6RwGPivFHLxvOGw&s=10'
 FROM category c WHERE c.name = 'Hogar'
                   AND NOT EXISTS (SELECT 1 FROM product p WHERE p.name = 'Silla de Oficina');
 
 INSERT INTO product (name, unit_price, stock, id_category, image_url)
-SELECT 'Lampara de Escritorio', 25.00, 1, c.id, 'https://placehold.co/400x300/16a34a/ffffff?text=Lampara'
+SELECT 'Lampara de Escritorio', 25.00, 1, c.id, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCqe-KTB1SB2vhbVy70pWg7xk0ELBfa8dgsaCTZI3WYg&s=10'
 FROM category c WHERE c.name = 'Hogar'
                   AND NOT EXISTS (SELECT 1 FROM product p WHERE p.name = 'Lampara de Escritorio');
