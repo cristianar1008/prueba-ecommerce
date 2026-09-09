@@ -25,11 +25,11 @@
         <h3>Precio</h3>
         <label class="price-field">
           <span>Mínimo</span>
-          <input type="number" min="0" placeholder="0" [value]="minPriceDisplay()" (input)="onMinPriceInput($event)" />
+          <input type="number" min="0" placeholder="0" [value]="minPriceText()" (input)="onMinPriceInput($event)" />
         </label>
         <label class="price-field">
           <span>Máximo</span>
-          <input type="number" min="0" placeholder="Sin límite" [value]="maxPriceDisplay()" (input)="onMaxPriceInput($event)" />
+          <input type="number" min="0" placeholder="Sin límite" [value]="maxPriceText()" (input)="onMaxPriceInput($event)" />
         </label>
       </div>
 

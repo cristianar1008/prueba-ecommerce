@@ -16,6 +16,15 @@ interface CatalogRow {
  * no necesita ida y vuelta al backend. `rows` combina productos + líneas
  * del carrito (para el stock disponible); `filteredRows` deriva de ahí
  * aplicando texto de búsqueda, categorías marcadas y rango de precio.
+ *
+ * minPriceText/maxPriceText guardan EXACTAMENTE lo que el usuario escribe
+ * (texto crudo) y son lo único que el <input> refleja de vuelta -
+ * minPrice/maxPrice (numéricos, para filtrar) se derivan de ahí pero
+ * nunca se reescriben sobre el campo. Si el <input> reflejara el numero
+ * ya parseado (String(Number(texto))) en cada tecla, escribir un punto
+ * decimal o un cero a la izquierda se "comeria" el caracter que el
+ * usuario acaba de tipear, porque Number("10.") es 10 y String(10) es
+ * "10" - el campo saltaria mientras se escribe.
  */
 @Component({
   selector: 'app-catalog',
@@ -42,8 +51,11 @@ export class Catalog implements OnInit {
 
   readonly searchTerm = signal('');
   readonly selectedCategories = signal<ReadonlySet<string>>(new Set<string>());
-  readonly minPrice = signal<number | null>(null);
-  readonly maxPrice = signal<number | null>(null);
+  readonly minPriceText = signal('');
+  readonly maxPriceText = signal('');
+
+  readonly minPrice = computed<number | null>(() => this.parsePrice(this.minPriceText()));
+  readonly maxPrice = computed<number | null>(() => this.parsePrice(this.maxPriceText()));
 
   readonly categories = computed<string[]>(() => {
     const names = new Set(this.rows().map((row) => row.product.categoryName));
@@ -73,16 +85,6 @@ export class Catalog implements OnInit {
       }
       return true;
     });
-  });
-
-  readonly minPriceDisplay = computed<string>(() => {
-    const value = this.minPrice();
-    return value === null ? '' : String(value);
-  });
-
-  readonly maxPriceDisplay = computed<string>(() => {
-    const value = this.maxPrice();
-    return value === null ? '' : String(value);
   });
 
   readonly activeFilterCount = computed<number>(() => {
@@ -117,18 +119,18 @@ export class Catalog implements OnInit {
   }
 
   onMinPriceInput(event: Event): void {
-    this.minPrice.set(this.parsePrice((event.target as HTMLInputElement).value));
+    this.minPriceText.set((event.target as HTMLInputElement).value);
   }
 
   onMaxPriceInput(event: Event): void {
-    this.maxPrice.set(this.parsePrice((event.target as HTMLInputElement).value));
+    this.maxPriceText.set((event.target as HTMLInputElement).value);
   }
 
   clearFilters(): void {
     this.searchTerm.set('');
     this.selectedCategories.set(new Set<string>());
-    this.minPrice.set(null);
-    this.maxPrice.set(null);
+    this.minPriceText.set('');
+    this.maxPriceText.set('');
   }
 
   private matchesSearch(product: Product, term: string): boolean {
