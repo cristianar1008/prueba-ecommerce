@@ -137,4 +137,62 @@ class CheckoutServiceTest {
         assertThat(product.getStock()).isEqualTo(9); // 10 - 1
         verify(orderRepository).save(any(Order.class));
     }
+
+    // ---- simulate(): mismo motor de descuentos, sin efectos secundarios ----
+
+    @Test
+    void simulateLanzaEmptyCartExceptionCuandoLaListaDeItemsEsNula() {
+        CheckoutRequest request = new CheckoutRequest(null, null);
+
+        assertThatThrownBy(() -> checkoutService.simulate(request))
+                .isInstanceOf(EmptyCartException.class);
+
+        verifyNoInteractions(productRepository, orderRepository, discountChainFactory);
+    }
+
+    @Test
+    void simulateLanzaProductNotFoundExceptionCuandoElProductoNoExiste() {
+        when(productRepository.findById(99L)).thenReturn(Optional.empty());
+        CheckoutRequest request = new CheckoutRequest(List.of(new CheckoutItemRequest(99L, 1)), null);
+
+        assertThatThrownBy(() -> checkoutService.simulate(request))
+                .isInstanceOf(ProductNotFoundException.class);
+
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void simulateLanzaInsufficientStockExceptionCuandoLaCantidadPedidaSuperaElStock() {
+        Product product = laptopConStock(1);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        CheckoutRequest request = new CheckoutRequest(List.of(new CheckoutItemRequest(1L, 5)), null);
+
+        assertThatThrownBy(() -> checkoutService.simulate(request))
+                .isInstanceOf(InsufficientStockException.class);
+
+        verifyNoInteractions(orderRepository);
+    }
+
+    @Test
+    void simulateCalculaElDesgloseSinBloquearNiDecrementarStockNiPersistirNada() {
+        Product product = laptopConStock(10);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        DiscountRule sinDescuentos = context -> context.closeWithFinalTotal(BigDecimal.ZERO, false);
+        when(discountChainFactory.create()).thenReturn(new DiscountChain(List.of(sinDescuentos)));
+
+        CheckoutRequest request = new CheckoutRequest(List.of(new CheckoutItemRequest(1L, 3)), null);
+
+        CheckoutResponse response = checkoutService.simulate(request);
+
+        assertThat(response.orderId()).isNull();
+        assertThat(response.subtotalOriginal()).isEqualByComparingTo("450.00");
+        assertThat(response.totalToPay()).isEqualByComparingTo("450.00");
+        assertThat(product.getStock()).isEqualTo(10); // no se toca el stock
+
+        verify(productRepository, never()).findWithLockById(any());
+        verify(productRepository, never()).saveAll(any());
+        verifyNoInteractions(orderRepository);
+    }
 }

@@ -59,21 +59,11 @@ public class CheckoutService {
             Product product = productRepository.findWithLockById(itemRequest.productId())
                     .orElseThrow(() -> new ProductNotFoundException(itemRequest.productId()));
 
-            if (product.getStock() < itemRequest.quantity()) {
-                throw new InsufficientStockException(
-                        product.getId(), itemRequest.quantity(), product.getStock());
-            }
-
+            CartItem cartItem = toCartItem(product, itemRequest.quantity());
             product.setStock(product.getStock() - itemRequest.quantity());
-            lockedProducts.add(product);
 
-            cartItems.add(new CartItem(
-                    product.getId(),
-                    product.getName(),
-                    product.getUnitPrice(),
-                    itemRequest.quantity(),
-                    toCategoryType(product)
-            ));
+            lockedProducts.add(product);
+            cartItems.add(cartItem);
         }
 
         productRepository.saveAll(lockedProducts);
@@ -89,8 +79,60 @@ public class CheckoutService {
 
         Order savedOrder = orderRepository.save(order);
 
+        return toResponse(savedOrder.getId(), breakdown);
+    }
+
+    /**
+     * Igual que checkout(), pero de solo lectura: no bloquea productos, no
+     * decrementa stock y no crea ninguna Order. Sirve para que el frontend
+     * le muestre al cliente el desglose de descuentos (categoria + volumen
+     * + cupon + tope 35%) ANTES de confirmar la compra real, sin efectos
+     * secundarios sobre el inventario. Reutiliza el mismo DiscountChain
+     * que el checkout real, asi que el numero que se previsualiza es
+     * exactamente el mismo que se cobra despues.
+     */
+    @Transactional(readOnly = true)
+    public CheckoutResponse simulate(CheckoutRequest request) {
+        if (request == null || request.items() == null || request.items().isEmpty()) {
+            throw new EmptyCartException();
+        }
+
+        List<CartItem> cartItems = new ArrayList<>();
+        for (CheckoutItemRequest itemRequest : request.items()) {
+            Product product = productRepository.findById(itemRequest.productId())
+                    .orElseThrow(() -> new ProductNotFoundException(itemRequest.productId()));
+            cartItems.add(toCartItem(product, itemRequest.quantity()));
+        }
+
+        DiscountContext context = new DiscountContext(cartItems, request.couponCode());
+        DiscountChain chain = discountChainFactory.create();
+        DiscountBreakdown breakdown = chain.execute(context);
+
+        return toResponse(null, breakdown);
+    }
+
+    private CartItem toCartItem(Product product, Integer quantity) {
+        if (product.getStock() < quantity) {
+            throw new InsufficientStockException(product.getId(), quantity, product.getStock());
+        }
+        return new CartItem(
+                product.getId(),
+                product.getName(),
+                product.getUnitPrice(),
+                quantity,
+                toCategoryType(product)
+        );
+    }
+
+    private CategoryType toCategoryType(Product product) {
+        return "Tecnologia".equalsIgnoreCase(product.getCategory().getName())
+                ? CategoryType.TECNOLOGIA
+                : CategoryType.OTRO;
+    }
+
+    private CheckoutResponse toResponse(Long orderId, DiscountBreakdown breakdown) {
         return new CheckoutResponse(
-                savedOrder.getId(),
+                orderId,
                 breakdown.subtotalOriginal(),
                 breakdown.categoryDiscountAmount(),
                 breakdown.volumeDiscountAmount(),
@@ -100,12 +142,6 @@ public class CheckoutService {
                 breakdown.effectiveDiscountPercentage(),
                 breakdown.totalToPay()
         );
-    }
-
-    private CategoryType toCategoryType(Product product) {
-        return "Tecnologia".equalsIgnoreCase(product.getCategory().getName())
-                ? CategoryType.TECNOLOGIA
-                : CategoryType.OTRO;
     }
 
     private Order buildOrder(DiscountBreakdown breakdown, String couponCode) {

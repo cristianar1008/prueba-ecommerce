@@ -25,4 +25,17 @@ public class CheckoutController {
         CheckoutResponse response = checkoutService.checkout(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    /**
+     * Simulacion de solo lectura: mismo request/response que el checkout
+     * real, pero no bloquea ni decrementa stock y no persiste ninguna
+     * Order. Pensado para el carrito del frontend: "Ir a pagar" dispara
+     * esto para mostrar el desglose de descuentos antes de que el cliente
+     * confirme la compra de verdad con POST /api/checkout.
+     */
+    @PostMapping("/simulate")
+    public ResponseEntity<CheckoutResponse> simulate(@RequestBody CheckoutRequest request) {
+        CheckoutResponse response = checkoutService.simulate(request);
+        return ResponseEntity.ok(response);
+    }
 }
