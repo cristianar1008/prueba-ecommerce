@@ -281,7 +281,7 @@ erDiagram
 ### 6.3 Datos precargados (`data.sql`, idempotente vía `ON CONFLICT DO NOTHING` / `NOT EXISTS`)
 
 - Categorías: `Tecnologia` (10% de descuento activo, sin vencimiento), `Hogar` (sin descuento de categoría).
-- Cupones: `WELCOME2026` (15%, `ACTIVO`, vence 2027-12-31 — el que exige el enunciado) y `PROMO2020` (20%, `ACTIVO`, vence 2027-12-31).
+- Cupones: `WELCOME2026` (15%, `ACTIVO`, vence 2027-12-31 — el que exige el enunciado) y `PROMO2020` (30%, `ACTIVO`, vence 2027-12-31 — suficiente para superar el tope del 35% en un carrito 100% Tecnología por encima de $100, dado que `WELCOME2026` solo nunca lo alcanza).
 - 6 productos: Laptop X1 ($150, stock 10), Mouse Inalámbrico ($50, stock 20), Teclado Mecánico ($80, stock 15), Monitor 24" ($120, stock 8) — todos Tecnología —, Silla de Oficina ($90, stock 5) y Lámpara de Escritorio ($25, stock 1) — Hogar.
 
 ## 7. Contrato REST y OpenAPI/Swagger
@@ -380,13 +380,13 @@ Casos de borde cubiertos explícitamente por archivo de test:
 
 - `DiscountCapRuleTest` — límite exacto del 35% (descuento crudo igual al tope no lo activa; un centavo más sí).
 - `DiscountContextTest` / `CartItemTest` — carrito vacío (`IllegalArgumentException`), `unitPrice`/`quantity` inválidos.
-- `CouponDiscountRuleTest`, `JpaCouponPolicyProviderTest` — cupón inexistente, expirado, y ya usado (`InvalidCouponException`).
+- `CouponDiscountRuleTest`, `JpaCouponPolicyProviderTest` — cupón inexistente, expirado y en estado no activo (bloqueado / usado); `CouponDiscountRule` traduce cualquiera de esos a `InvalidCouponException`.
 - `CheckoutServiceTest` — intento de compra con stock insuficiente (`InsufficientStockException`).
 - `CategoryDiscountRuleTest`, `VolumeDiscountRuleTest` — umbral exacto de $100 (no dispara con `<=`), ítems mixtos Tecnología/Hogar.
 
 ### 10.2 Frontend — Vitest (`@angular/build:unit-test`)
 
-`angular.json` acota la cobertura medida a `core/**` y `shared/**` (excluyendo `core/models/**`, que son solo interfaces sin lógica), dejando fuera `features/**` (componentes de presentación). Estado actual: **67/67 tests, 98.81% de cobertura** en ese alcance.
+`angular.json` acota la cobertura medida a `core/**` y `shared/**` (excluyendo `core/models/**`, que son solo interfaces sin lógica), dejando fuera `features/**` (componentes de presentación). Estado actual: **67 tests en 13 archivos, todos en verde**; sobre el alcance medido, **94.24% de líneas, 94.67% de sentencias, 92.75% de ramas y 88.23% de funciones** (los componentes de `features/**` igual tienen tests —carrito, catálogo, checkout, alerta— pero no cuentan para el gate de cobertura).
 
 Comandos:
 

@@ -124,7 +124,7 @@ cd apps/frontend
 npx ng test --watch=false --coverage
 ```
 
-Corre los 56 tests unitarios (Vitest) y muestra en la terminal el resumen de cobertura por archivo, acotada a las capas lógicas esenciales (`core/` y `shared/`, configurado en `angular.json`).
+Corre los 67 tests unitarios (Vitest) y muestra en la terminal el resumen de cobertura por archivo, acotada a las capas lógicas esenciales (`core/` y `shared/`, configurado en `angular.json`).
 
 Para build de producción (verificación de compilación limpia):
 
