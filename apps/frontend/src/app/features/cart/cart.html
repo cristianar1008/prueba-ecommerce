@@ -1,0 +1,37 @@
+<section class="cart" aria-label="Carrito de compras">
+  <h2>Tu carrito</h2>
+
+  @if ((lines$ | async); as lines) {
+    @if (lines.length === 0) {
+      <p class="empty">Tu carrito está vacío. Agrega productos del catálogo.</p>
+    } @else {
+      <ul class="lines">
+        @for (line of lines; track line.product.id) {
+          <li>
+            <div class="info">
+              <span class="name">{{ line.product.name }}</span>
+              <span class="unit-price">{{ line.product.unitPrice | currency: 'USD' }} c/u</span>
+            </div>
+            <div class="qty">
+              <button type="button" (click)="decrement(line.product.id)" aria-label="Quitar una unidad">−</button>
+              <span>{{ line.quantity }}</span>
+              <button
+                type="button"
+                (click)="increment(line.product.id)"
+                [disabled]="line.quantity >= line.product.stock"
+                aria-label="Agregar una unidad"
+              >+</button>
+            </div>
+            <span class="line-total">{{ line.product.unitPrice * line.quantity | currency: 'USD' }}</span>
+            <button type="button" class="remove" (click)="remove(line.product.id)" aria-label="Quitar del carrito">✕</button>
+          </li>
+        }
+      </ul>
+
+      <div class="subtotal">
+        <span>Subtotal</span>
+        <strong>{{ (subtotal$ | async) | currency: 'USD' }}</strong>
+      </div>
+    }
+  }
+</section>

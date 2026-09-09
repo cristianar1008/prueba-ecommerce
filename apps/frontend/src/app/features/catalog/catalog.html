@@ -1,0 +1,32 @@
+<section class="catalog" aria-label="Catálogo de productos">
+  <h2>Catálogo</h2>
+
+  @if ((rows$ | async); as rows) {
+    @if (rows.length === 0) {
+      <p class="empty">Cargando productos…</p>
+    } @else {
+      <div class="grid">
+        @for (row of rows; track row.product.id) {
+          <article class="card">
+            <img [src]="row.product.imageUrl" [alt]="row.product.name" />
+            <div class="body">
+              <h3>{{ row.product.name }}</h3>
+              <span class="category">{{ row.product.categoryName }}</span>
+              <span class="price">{{ row.product.unitPrice | currency: 'USD' }}</span>
+              <span class="stock" [class.low]="row.product.stock - row.quantityInCart <= 3">
+                Stock disponible: {{ row.product.stock - row.quantityInCart }}
+              </span>
+              <button
+                type="button"
+                (click)="addToCart(row.product)"
+                [disabled]="row.quantityInCart >= row.product.stock"
+              >
+                Agregar al carrito
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+</section>

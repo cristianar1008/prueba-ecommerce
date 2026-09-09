@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
+import { Catalog } from './features/catalog/catalog';
+import { Cart } from './features/cart/cart';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [Catalog, Cart],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
