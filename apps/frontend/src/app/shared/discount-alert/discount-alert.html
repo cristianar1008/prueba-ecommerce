@@ -1,0 +1,6 @@
+@if (visible()) {
+  <div class="discount-alert" role="alert" aria-live="assertive">
+    <span>¡Enhorabuena! Has alcanzado el límite máximo de ahorro permitido (35%)</span>
+    <button type="button" (click)="dismiss()" aria-label="Cerrar notificación">✕</button>
+  </div>
+}
