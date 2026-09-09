@@ -7,10 +7,13 @@ import org.ecommerce.backend.domain.exception.ProductNotFoundException;
 import org.ecommerce.backend.web.dto.ApiError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -38,6 +41,23 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> handleIllegalArgument(IllegalArgumentException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    /**
+     * Dispara cuando un @RequestBody @Valid falla la validacion Bean
+     * Validation (ej. items vacio, productId/quantity nulos o quantity
+     * negativo/cero). Convierte los errores de campo a un unico mensaje
+     * legible en vez de dejar pasar el JSON default de Spring, para que
+     * el frontend reciba el mismo formato de ApiError que el resto de
+     * los errores de la API.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .sorted(Comparator.comparing(fieldError -> fieldError.getField()))
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return buildResponse(HttpStatus.BAD_REQUEST, message.isBlank() ? "Solicitud invalida" : message);
     }
 
     @ExceptionHandler(Exception.class)

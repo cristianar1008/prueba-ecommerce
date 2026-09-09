@@ -3,6 +3,7 @@ package org.ecommerce.backend.web.controller;
 import org.ecommerce.backend.application.service.CheckoutService;
 import org.ecommerce.backend.web.dto.CheckoutRequest;
 import org.ecommerce.backend.web.dto.CheckoutResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class CheckoutController {
     }
 
     @PostMapping
-    public ResponseEntity<CheckoutResponse> checkout(@RequestBody CheckoutRequest request) {
+    public ResponseEntity<CheckoutResponse> checkout(@RequestBody @Valid CheckoutRequest request) {
         CheckoutResponse response = checkoutService.checkout(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -34,7 +35,7 @@ public class CheckoutController {
      * confirme la compra de verdad con POST /api/checkout.
      */
     @PostMapping("/simulate")
-    public ResponseEntity<CheckoutResponse> simulate(@RequestBody CheckoutRequest request) {
+    public ResponseEntity<CheckoutResponse> simulate(@RequestBody @Valid CheckoutRequest request) {
         CheckoutResponse response = checkoutService.simulate(request);
         return ResponseEntity.ok(response);
     }
