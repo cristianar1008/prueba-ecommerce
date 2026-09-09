@@ -16,6 +16,8 @@ INSERT INTO state_coupon (name) VALUES ('ACTIVO')
     ON CONFLICT (name) DO NOTHING;
 INSERT INTO state_coupon (name) VALUES ('EXPIRADO')
     ON CONFLICT (name) DO NOTHING;
+INSERT INTO state_coupon (name) VALUES ('USADO')
+    ON CONFLICT (name) DO NOTHING;
 
 -- Descuento de categoria: 10% para Tecnologia, sin fecha de vencimiento
 INSERT INTO discount (category_id, percentage, valid_from, valid_to, active)

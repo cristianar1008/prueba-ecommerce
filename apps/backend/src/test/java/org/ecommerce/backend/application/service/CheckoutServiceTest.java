@@ -8,11 +8,14 @@ import org.ecommerce.backend.domain.exception.EmptyCartException;
 import org.ecommerce.backend.domain.exception.InsufficientStockException;
 import org.ecommerce.backend.domain.exception.ProductNotFoundException;
 import org.ecommerce.backend.infrastructure.persistence.entity.Category;
+import org.ecommerce.backend.infrastructure.persistence.entity.Coupon;
 import org.ecommerce.backend.infrastructure.persistence.entity.Order;
 import org.ecommerce.backend.infrastructure.persistence.entity.Product;
+import org.ecommerce.backend.infrastructure.persistence.entity.StateCoupon;
 import org.ecommerce.backend.infrastructure.persistence.repository.CouponRepository;
 import org.ecommerce.backend.infrastructure.persistence.repository.OrderRepository;
 import org.ecommerce.backend.infrastructure.persistence.repository.ProductRepository;
+import org.ecommerce.backend.infrastructure.persistence.repository.StateCouponRepository;
 import org.ecommerce.backend.web.dto.CheckoutItemRequest;
 import org.ecommerce.backend.web.dto.CheckoutRequest;
 import org.ecommerce.backend.web.dto.CheckoutResponse;
@@ -23,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +48,8 @@ class CheckoutServiceTest {
     @Mock
     private CouponRepository couponRepository;
     @Mock
+    private StateCouponRepository stateCouponRepository;
+    @Mock
     private DiscountChainFactory discountChainFactory;
 
     @InjectMocks
@@ -60,6 +66,19 @@ class CheckoutServiceTest {
         product.setStock(stock);
         product.setCategory(tecnologia);
         return product;
+    }
+
+    private Coupon cuponActivo(String code) {
+        StateCoupon activo = new StateCoupon();
+        activo.setName("ACTIVO");
+
+        Coupon coupon = new Coupon();
+        coupon.setId(10L);
+        coupon.setCode(code);
+        coupon.setDiscountPercentage(new BigDecimal("0.15"));
+        coupon.setExpiresAt(LocalDateTime.now().plusYears(1));
+        coupon.setState(activo);
+        return coupon;
     }
 
     @Test
@@ -136,6 +155,57 @@ class CheckoutServiceTest {
         assertThat(response.totalToPay()).isEqualByComparingTo("150.00");
         assertThat(product.getStock()).isEqualTo(9); // 10 - 1
         verify(orderRepository).save(any(Order.class));
+    }
+
+    @Test
+    void marcaElCuponComoUsadoCuandoElCheckoutSeConfirmaConUnCuponValido() {
+        Product product = laptopConStock(10);
+        when(productRepository.findWithLockById(1L)).thenReturn(Optional.of(product));
+
+        DiscountRule sinDescuentos = context -> context.closeWithFinalTotal(BigDecimal.ZERO, false);
+        when(discountChainFactory.create()).thenReturn(new DiscountChain(List.of(sinDescuentos)));
+
+        Coupon coupon = cuponActivo("WELCOME2026");
+        when(couponRepository.findByCodeIgnoreCase("WELCOME2026")).thenReturn(Optional.of(coupon));
+
+        StateCoupon usado = new StateCoupon();
+        usado.setName("USADO");
+        when(stateCouponRepository.findByNameIgnoreCase("USADO")).thenReturn(Optional.of(usado));
+
+        when(couponRepository.save(any(Coupon.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
+            Order order = invocation.getArgument(0);
+            order.setId(501L);
+            return order;
+        });
+
+        CheckoutRequest request = new CheckoutRequest(List.of(new CheckoutItemRequest(1L, 1)), "WELCOME2026");
+
+        checkoutService.checkout(request);
+
+        assertThat(coupon.getState().getName()).isEqualTo("USADO");
+        verify(couponRepository).save(coupon);
+    }
+
+    @Test
+    void noTocaNingunCuponCuandoElCheckoutSeHaceSinCodigoDeCupon() {
+        Product product = laptopConStock(10);
+        when(productRepository.findWithLockById(1L)).thenReturn(Optional.of(product));
+
+        DiscountRule sinDescuentos = context -> context.closeWithFinalTotal(BigDecimal.ZERO, false);
+        when(discountChainFactory.create()).thenReturn(new DiscountChain(List.of(sinDescuentos)));
+
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
+            Order order = invocation.getArgument(0);
+            order.setId(502L);
+            return order;
+        });
+
+        CheckoutRequest request = new CheckoutRequest(List.of(new CheckoutItemRequest(1L, 1)), null);
+
+        checkoutService.checkout(request);
+
+        verifyNoInteractions(couponRepository, stateCouponRepository);
     }
 
     // ---- simulate(): mismo motor de descuentos, sin efectos secundarios ----
