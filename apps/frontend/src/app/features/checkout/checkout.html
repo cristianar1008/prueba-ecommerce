@@ -1,0 +1,39 @@
+<section class="checkout" aria-label="Checkout">
+  <h2>Checkout</h2>
+
+  <label class="coupon-field">
+    <span>Código de cupón (opcional)</span>
+    <input
+      type="text"
+      placeholder="Ej. WELCOME2026"
+      [ngModel]="couponCode()"
+      (ngModelChange)="couponCode.set($event)"
+    />
+  </label>
+
+  @if (error$ | async; as error) {
+    <p class="error" role="alert">{{ error }}</p>
+  }
+
+  <button type="button" class="confirm" (click)="confirm()" [disabled]="(loading$ | async) ?? false">
+    @if (loading$ | async) {
+      Procesando…
+    } @else {
+      Aplicar cupón y confirmar compra
+    }
+  </button>
+
+  @if (result$ | async; as result) {
+    <div class="breakdown">
+      <h3>Desglose de la orden</h3>
+      <dl>
+        <div class="row"><dt>Subtotal original</dt><dd>{{ result.subtotalOriginal | currency: 'USD' }}</dd></div>
+        <div class="row"><dt>Descuento de categoría</dt><dd>− {{ result.categoryDiscountAmount | currency: 'USD' }}</dd></div>
+        <div class="row"><dt>Descuento por volumen</dt><dd>− {{ result.volumeDiscountAmount | currency: 'USD' }}</dd></div>
+        <div class="row"><dt>Descuento por cupón</dt><dd>− {{ result.couponDiscountAmount | currency: 'USD' }}</dd></div>
+        <div class="row total"><dt>Ahorro total ({{ result.effectiveDiscountPercentage | number: '1.2-2' }}%)</dt><dd>− {{ result.totalDiscountAmount | currency: 'USD' }}</dd></div>
+        <div class="row grand"><dt>Total a pagar</dt><dd>{{ result.totalToPay | currency: 'USD' }}</dd></div>
+      </dl>
+    </div>
+  }
+</section>

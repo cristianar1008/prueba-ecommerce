@@ -1,0 +1,70 @@
+.checkout h2 {
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+}
+.coupon-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: #334155;
+  margin-bottom: 12px;
+}
+.coupon-field input {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+.error {
+  color: #b91c1c;
+  font-size: 0.85rem;
+  margin: 0 0 10px;
+}
+.confirm {
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #16a34a;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.confirm:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+.breakdown {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+.breakdown h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+.breakdown dl {
+  margin: 0;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  padding: 4px 0;
+  font-variant-numeric: tabular-nums;
+}
+.row dt {
+  color: #475569;
+}
+.row.total {
+  font-weight: 600;
+  border-top: 1px dashed #cbd5e1;
+  margin-top: 4px;
+  padding-top: 8px;
+}
+.row.grand {
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding-top: 8px;
+}
