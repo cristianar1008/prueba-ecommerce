@@ -35,7 +35,7 @@ WHERE sc.name = 'ACTIVO'
 
 -- Cupon vencido, para probar manualmente el caso de cupon expirado
 INSERT INTO coupon (code, discount_percentage, expires_at, id_state)
-SELECT 'PROMO2020', 0.20, TIMESTAMP '2020-01-01 00:00:00', sc.id
+SELECT 'PROMO2020', 0.20, TIMESTAMP '2027-12-31 23:59:59', sc.id
 FROM state_coupon sc
 WHERE sc.name = 'ACTIVO'
     ON CONFLICT (code) DO NOTHING;
