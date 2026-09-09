@@ -56,7 +56,7 @@ docker compose up -d
 Esto levanta un PostgreSQL 16 en el puerto `5432` (o el que hayas configurado en `POSTGRES_PORT`). Al arrancar el backend por primera vez, Hibernate crea el esquema (`ddl-auto: update`) y `data.sql` precarga automáticamente:
 
 - **Categorías**: `Tecnologia` (con 10% de descuento activo), `Hogar`.
-- **Cupones**: `WELCOME2026` (15%, activo — el que pide el enunciado) y `PROMO2020` (20%, vencido — para probar el caso de cupón expirado).
+- **Cupones**: `WELCOME2026` (15%, activo — el que pide el enunciado) y `PROMO2020` (30%, activo — suficiente para superar el tope del 35% en un carrito 100% Tecnología por encima de $100).
 - **6 productos de catálogo** (4 de Tecnología, 2 de Hogar) con stock inicial.
 
 La carga es idempotente: podés reiniciar el backend las veces que quieras sin duplicar filas.
@@ -100,6 +100,7 @@ Queda disponible en **`http://localhost:4200`**. El proxy de desarrollo (`proxy.
 3. Click en **"Ir a pagar"**: te lleva a la vista de checkout, que calcula el desglose **con** descuentos (categoría, volumen, cupón, tope del 35%) contra el backend.
 4. (Opcional) Ingresá el cupón `WELCOME2026` en el recuadro de la derecha y click en **"Validar"** — la validación es explícita, no se dispara sola mientras escribís.
 5. Click en **"Pagar"** para confirmar la compra real: decrementa el stock y persiste la orden. Si volvés a intentar pagar con el mismo cupón, el backend ya lo rechaza porque quedó marcado como usado.
+6. Para mostrar la alerta del tope del 35% (HU4): armá un carrito solo con productos de Tecnología por encima de $100 (por ejemplo, varias unidades de Laptop X1) y aplicá el cupón `PROMO2020` en vez de `WELCOME2026` — con `WELCOME2026` solo (15%) el descuento máximo posible es ~27.3%, nunca alcanza el tope.
 
 ## 6. Correr las pruebas y ver la cobertura
 
