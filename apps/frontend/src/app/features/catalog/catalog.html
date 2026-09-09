@@ -1,32 +1,83 @@
 <section class="catalog" aria-label="Catálogo de productos">
   <h2>Catálogo</h2>
 
-  @if ((rows$ | async); as rows) {
-    @if (rows.length === 0) {
-      <p class="empty">Cargando productos…</p>
-    } @else {
-      <div class="grid">
-        @for (row of rows; track row.product.id) {
-          <article class="card">
-            <img [src]="row.product.imageUrl" [alt]="row.product.name" />
-            <div class="body">
-              <h3>{{ row.product.name }}</h3>
-              <span class="category">{{ row.product.categoryName }}</span>
-              <span class="price">{{ row.product.unitPrice | currency: 'USD' }}</span>
-              <span class="stock" [class.low]="row.product.stock - row.quantityInCart <= 3">
-                Stock disponible: {{ row.product.stock - row.quantityInCart }}
-              </span>
-              <button
-                type="button"
-                (click)="addToCart(row.product)"
-                [disabled]="row.quantityInCart >= row.product.stock"
-              >
-                Agregar al carrito
-              </button>
-            </div>
-          </article>
+  <div class="catalog-layout">
+    <aside class="filters" aria-label="Filtros de productos">
+      <div class="filter-group">
+        <h3>Categoría</h3>
+        @if (categories().length === 0) {
+          <p class="filter-empty">Sin categorías aún</p>
+        } @else {
+          @for (category of categories(); track category) {
+            <label class="checkbox-row">
+              <input
+                type="checkbox"
+                [checked]="selectedCategories().has(category)"
+                (change)="onCategoryToggle(category, $event)"
+              />
+              <span>{{ category }}</span>
+            </label>
+          }
         }
       </div>
-    }
-  }
+
+      <div class="filter-group">
+        <h3>Precio</h3>
+        <label class="price-field">
+          <span>Mínimo</span>
+          <input type="number" min="0" placeholder="0" [value]="minPriceDisplay()" (input)="onMinPriceInput($event)" />
+        </label>
+        <label class="price-field">
+          <span>Máximo</span>
+          <input type="number" min="0" placeholder="Sin límite" [value]="maxPriceDisplay()" (input)="onMaxPriceInput($event)" />
+        </label>
+      </div>
+
+      @if (activeFilterCount() > 0) {
+        <button type="button" class="clear-filters" (click)="clearFilters()">
+          Limpiar filtros ({{ activeFilterCount() }})
+        </button>
+      }
+    </aside>
+
+    <div class="catalog-content">
+      <input
+        type="search"
+        class="search-box"
+        placeholder="Buscar por nombre o categoría…"
+        [value]="searchTerm()"
+        (input)="onSearchInput($event)"
+        aria-label="Buscar productos"
+      />
+
+      @if (rows().length === 0) {
+        <p class="empty">Cargando productos…</p>
+      } @else if (filteredRows().length === 0) {
+        <p class="empty">No se encontraron productos con esos filtros.</p>
+      } @else {
+        <div class="grid">
+          @for (row of filteredRows(); track row.product.id) {
+            <article class="card">
+              <img [src]="row.product.imageUrl" [alt]="row.product.name" />
+              <div class="body">
+                <h3>{{ row.product.name }}</h3>
+                <span class="category">{{ row.product.categoryName }}</span>
+                <span class="price">{{ row.product.unitPrice | currency: 'USD' }}</span>
+                <span class="stock" [class.low]="row.product.stock - row.quantityInCart <= 3">
+                  Stock disponible: {{ row.product.stock - row.quantityInCart }}
+                </span>
+                <button
+                  type="button"
+                  (click)="addToCart(row.product)"
+                  [disabled]="row.quantityInCart >= row.product.stock"
+                >
+                  Agregar al carrito
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </div>
+  </div>
 </section>

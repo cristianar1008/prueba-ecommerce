@@ -5,6 +5,88 @@
 .empty {
   color: #64748b;
 }
+.catalog-layout {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 640px) {
+  .catalog-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.filters {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.filter-group h3 {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #475569;
+}
+.filter-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #1e293b;
+  padding: 3px 0;
+  cursor: pointer;
+}
+.checkbox-row input {
+  cursor: pointer;
+}
+.price-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #475569;
+  margin-bottom: 8px;
+}
+.price-field input {
+  padding: 6px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+.clear-filters {
+  padding: 8px 10px;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  background: #fff;
+  color: #1e293b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.catalog-content {
+  min-width: 0;
+}
+.search-box {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
