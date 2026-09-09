@@ -41,14 +41,22 @@
     </aside>
 
     <div class="catalog-content">
-      <input
-        type="search"
-        class="search-box"
-        placeholder="Buscar por nombre o categoría…"
-        [value]="searchTerm()"
-        (input)="onSearchInput($event)"
-        aria-label="Buscar productos"
-      />
+      <div class="toolbar">
+        <input
+          type="search"
+          class="search-box"
+          placeholder="Buscar por nombre o categoría…"
+          [value]="searchTerm()"
+          (input)="onSearchInput($event)"
+          aria-label="Buscar productos"
+        />
+
+        <select class="sort-select" [value]="sortOrder()" (change)="onSortChange($event)" aria-label="Ordenar por precio">
+          <option value="none">Ordenar por…</option>
+          <option value="asc">Precio: menor a mayor</option>
+          <option value="desc">Precio: mayor a menor</option>
+        </select>
+      </div>
 
       @if (rows().length === 0) {
         <p class="empty">Cargando productos…</p>

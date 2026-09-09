@@ -10,6 +10,8 @@ interface CatalogRow {
   quantityInCart: number;
 }
 
+type SortOrder = 'none' | 'asc' | 'desc';
+
 /**
  * Catálogo con filtros 100% client-side: los productos ya se traen todos
  * de una vez (GET /api/products, catálogo chico), así que buscar/filtrar
@@ -53,6 +55,7 @@ export class Catalog implements OnInit {
   readonly selectedCategories = signal<ReadonlySet<string>>(new Set<string>());
   readonly minPriceText = signal('');
   readonly maxPriceText = signal('');
+  readonly sortOrder = signal<SortOrder>('none');
 
   readonly minPrice = computed<number | null>(() => this.parsePrice(this.minPriceText()));
   readonly maxPrice = computed<number | null>(() => this.parsePrice(this.maxPriceText()));
@@ -68,7 +71,7 @@ export class Catalog implements OnInit {
     const min = this.minPrice();
     const max = this.maxPrice();
 
-    return this.rows().filter((row) => {
+    const filtered = this.rows().filter((row) => {
       const product = row.product;
 
       if (term.length > 0 && !this.matchesSearch(product, term)) {
@@ -85,6 +88,13 @@ export class Catalog implements OnInit {
       }
       return true;
     });
+
+    const order = this.sortOrder();
+    if (order === 'none') {
+      return filtered;
+    }
+    const sorted = [...filtered].sort((a, b) => a.product.unitPrice - b.product.unitPrice);
+    return order === 'asc' ? sorted : sorted.reverse();
   });
 
   readonly activeFilterCount = computed<number>(() => {
@@ -92,6 +102,7 @@ export class Catalog implements OnInit {
     if (this.searchTerm().trim().length > 0) count += 1;
     if (this.minPrice() !== null) count += 1;
     if (this.maxPrice() !== null) count += 1;
+    if (this.sortOrder() !== 'none') count += 1;
     return count;
   });
 
@@ -105,6 +116,11 @@ export class Catalog implements OnInit {
 
   onSearchInput(event: Event): void {
     this.searchTerm.set((event.target as HTMLInputElement).value);
+  }
+
+  onSortChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.sortOrder.set(value === 'asc' || value === 'desc' ? value : 'none');
   }
 
   onCategoryToggle(category: string, event: Event): void {
@@ -131,6 +147,7 @@ export class Catalog implements OnInit {
     this.selectedCategories.set(new Set<string>());
     this.minPriceText.set('');
     this.maxPriceText.set('');
+    this.sortOrder.set('none');
   }
 
   private matchesSearch(product: Product, term: string): boolean {

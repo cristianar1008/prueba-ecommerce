@@ -92,7 +92,7 @@ describe('Catalog', () => {
     expect(component.filteredRows().map((row) => row.product.id)).toEqual([3]);
   });
 
-  it('clearFilters() resetea busqueda, categorias y precios', () => {
+  it('clearFilters() resetea busqueda, categorias, precios y orden', () => {
     const { fixture } = createFixture([laptop, mouse, silla]);
     const component = fixture.componentInstance;
 
@@ -100,12 +100,44 @@ describe('Catalog', () => {
     component.onCategoryToggle('Hogar', { target: { checked: true } } as unknown as Event);
     component.onMinPriceInput({ target: { value: '10' } } as unknown as Event);
     component.onMaxPriceInput({ target: { value: '200' } } as unknown as Event);
-    expect(component.activeFilterCount()).toBe(4);
+    component.onSortChange({ target: { value: 'asc' } } as unknown as Event);
+    expect(component.activeFilterCount()).toBe(5);
 
     component.clearFilters();
 
     expect(component.activeFilterCount()).toBe(0);
+    expect(component.sortOrder()).toBe('none');
     expect(component.filteredRows().length).toBe(3);
+  });
+
+  it('ordena por precio ascendente', () => {
+    const { fixture } = createFixture([laptop, mouse, silla]);
+    const component = fixture.componentInstance;
+
+    const select = (fixture.nativeElement as HTMLElement).querySelector('.sort-select') as HTMLSelectElement;
+    select.value = 'asc';
+    select.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(component.filteredRows().map((row) => row.product.id)).toEqual([2, 3, 1]);
+  });
+
+  it('ordena por precio descendente', () => {
+    const { fixture } = createFixture([laptop, mouse, silla]);
+    const component = fixture.componentInstance;
+
+    component.onSortChange({ target: { value: 'desc' } } as unknown as Event);
+
+    expect(component.filteredRows().map((row) => row.product.id)).toEqual([1, 3, 2]);
+  });
+
+  it('un valor de orden invalido cae de vuelta a "none"', () => {
+    const { fixture } = createFixture([laptop, mouse, silla]);
+    const component = fixture.componentInstance;
+
+    component.onSortChange({ target: { value: 'bogus' } } as unknown as Event);
+
+    expect(component.sortOrder()).toBe('none');
   });
 
   it('descuenta la cantidad ya agregada al carrito del stock disponible', () => {
